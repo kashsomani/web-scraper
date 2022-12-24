@@ -38,11 +38,15 @@ async function main() {
     height: 1080,
   })
   await page.goto("https://cnft.tools/radioactivecrocsclub")
-  let maxInput = await page.evaluate(() =>
-    Array.from(
-      document.querySelectorAll(".mantine-1s9i825")
-    )
+  await page.waitForSelector(".mantine-1s9i825")
+  let maxInput = await page.evaluate(
+    () =>
+      Array.from(
+        document.querySelectorAll(".mantine-1s9i825")
+      )[1]
   )
+  console.log(maxInput)
+  maxInput = maxInput[1]
   console.log(maxInput)
   maxInput.type("1000")
   await page.waitForTimeout(1000)
