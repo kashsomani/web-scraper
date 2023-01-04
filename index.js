@@ -2,149 +2,44 @@ const puppeteer = require("puppeteer")
 // haha
 // cardanocrocsclub
 
-const getFloorFromCnftTools =
-  async function getFloorFromCnftTools(
-    collectionName,
-    range
-  ) {
-    console.log(
-      "getFloorFromCnftTools collectionName:" +
-        collectionName +
-        " range:" +
-        JSON.stringify(range)
-    )
-    try {
-      const browser = await puppeteer.launch()
-      const page = await browser.newPage()
-      await page.setViewport({
-        width: 1200,
-        height: 1500,
-      })
+const collectionBot = async (collectionName, rank) => {
+  const browser = await puppeteer.launch()
+  const page = await browser.newPage()
+  await page.setViewport({
+    width: 1200,
+    height: 1500,
+  })
 
-      await page.goto(
-        "https://cnft.tools/" + collectionName,
-        {
-          waitUntil: "networkidle2",
-        }
-      )
+  await page.goto("https://cnft.tools/" + collectionName, {
+    waitUntil: "networkidle2",
+  })
 
-      await page.click("#sort-type")
-      await page.keyboard.press("ArrowDown")
-      await page.keyboard.press("Enter")
-      await page.waitForTimeout(5000)
-
-      await page.type(
-        'input[placeholder="Min"]:first-child',
-        range.min.toString()
-      )
-      await page.type(
-        'input[placeholder="Max"]:first-child',
-        range.max.toString()
-      )
-      await page.click("button.mantine-txbd7p")
-      await page.waitForTimeout(1000)
-      const html = await page.content()
-
-      const result = []
-      let idx = 0
-      let end_idx = 0
-      do {
-        idx = html.indexOf('line-height: 1.5;">', idx)
-        if (idx == -1) {
-          continue
-        }
-        idx = idx + 'line-height: 1.5;">'.length
-
-        end_idx = html.indexOf("<", idx)
-        const asset_name = html
-          .substring(idx, end_idx)
-          .replace(" # ", "")
-        idx = end_idx
-
-        idx = html.indexOf('line-height: 1.5;">', idx)
-        idx = idx + 'line-height: 1.5;">'.length
-        idx = html.indexOf(">", idx)
-        end_idx = html.indexOf("<", idx)
-        const asset_price = html.substring(idx, end_idx)
-        const trimmed_asset_price = asset_price.substring(
-          1,
-          asset_price.length - 3
-        )
-        idx = end_idx
-        console.log({
-          collectionName: asset_name,
-          price: parseInt(trimmed_asset_price),
-        })
-        result.push({
-          collectionName: asset_name,
-          price: parseInt(trimmed_asset_price),
-        })
-      } while (idx != -1)
-
-      await browser.close()
-      return result
-    } catch (error) {
-      console.log("error", error)
-    }
-
-    return []
-  }
-const getSingleFloor = async (collectionName, range) => {
-  console.log(
-    "getFloorFromCnftTools collectionName:" +
-      collectionName +
-      " range:" +
-      JSON.stringify(range)
-  )
+  await page.click("#sort-type")
+  await page.keyboard.press("ArrowDown")
+  await page.keyboard.press("Enter")
   try {
-    const browser = await puppeteer.launch()
-    const page = await browser.newPage()
-    await page.setViewport({
-      width: 1200,
-      height: 1500,
-    })
-
-    await page.goto(
-      "https://cnft.tools/" + collectionName,
-      {
-        waitUntil: "networkidle2",
-      }
-    )
-
-    await page.click("#sort-type")
-    await page.keyboard.press("ArrowDown")
-    await page.keyboard.press("Enter")
     await page.waitForTimeout(5000)
 
     await page.type(
-      'input[placeholder="Min"]:first-child',
-      range.min.toString()
-    )
-    await page.type(
       'input[placeholder="Max"]:first-child',
-      range.max.toString()
+      rank
     )
     await page.click("button.mantine-txbd7p")
     await page.waitForTimeout(1000)
     const html = await page.content()
 
-    const result = []
     let idx = 0
     let end_idx = 0
     idx = html.indexOf('line-height: 1.5;">', idx)
     if (idx == -1) {
       return {
-        range,
-        price: "None",
+        rank,
+        price: 1000000,
       }
     }
     idx = idx + 'line-height: 1.5;">'.length
 
     end_idx = html.indexOf("<", idx)
-    const asset_name = html
-      .substring(idx, end_idx)
-      .replace(" # ", "")
-    idx = end_idx
 
     idx = html.indexOf('line-height: 1.5;">', idx)
     idx = idx + 'line-height: 1.5;">'.length
@@ -158,8 +53,9 @@ const getSingleFloor = async (collectionName, range) => {
     idx = end_idx
     await browser.close()
     return {
-      range,
+      rank: rank == "1" ? "SE" : rank,
       price: parseInt(trimmed_asset_price),
+      date: new Date(Date.now()).toISOString(),
     }
   } catch (error) {
     console.log("error", error)
@@ -167,7 +63,19 @@ const getSingleFloor = async (collectionName, range) => {
 
   return []
 }
-getSingleFloor("babycrocsclub", {
-  min: 1000,
-  max: 2000,
-}).then(r => console.log(r))
+const babyRanks = [
+  "1",
+  "500",
+  "1000",
+  "2000",
+  "3000",
+  "4000",
+  "5000",
+  "6000",
+]
+let results = []
+babyRanks.forEach(rank => {
+  const res = collectionBot("babycrocsclub", rank)
+  results.push(res)
+})
+Promise.all(results).then(result => console.log(result))
