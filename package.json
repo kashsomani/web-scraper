@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "DEBUG=nightmare* node index"
+    "test": " node index"
   },
   "repository": {
     "type": "git",
