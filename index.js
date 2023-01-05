@@ -11,7 +11,7 @@ const collectionBot = async (collectionName, ranks) => {
       const browser = await puppeteer.launch({
         timeout: 0,
         ignoreHTTPSErrors: true,
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        headless: false,
       })
       const page = await browser.newPage()
       await page.setViewport({
@@ -22,7 +22,9 @@ const collectionBot = async (collectionName, ranks) => {
       await page.goto(
         "https://cnft.tools/" + collectionName,
         {
-          waitUntil: "networkidle2",
+          waitUntil: "load",
+          // Remove the timeout
+          timeout: 0,
         }
       )
       await delay(3000)
