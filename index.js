@@ -23,7 +23,7 @@ const collectionBot = async (collectionName, ranks) => {
       await page.goto(
         "https://cnft.tools/" + collectionName,
         {
-          waitUntil: "load",
+          waitUntil: "networkidle2",
           // Remove the timeout
           timeout: 0,
         }
@@ -120,7 +120,7 @@ const updateDatabase = (collection, results) => {
       { ...el, date: new Date(Date.now()).toISOString() },
       config
     )
-    console.log(result)
+    console.log(result.data)
     return result.data
   })
 }
