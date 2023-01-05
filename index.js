@@ -12,6 +12,7 @@ const collectionBot = async (collectionName, ranks) => {
         timeout: 0,
         ignoreHTTPSErrors: true,
         headless: false,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
       })
       const page = await browser.newPage()
       await page.setViewport({
