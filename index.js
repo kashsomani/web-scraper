@@ -11,7 +11,7 @@ const collectionBot = async (collectionName, ranks) => {
       const browser = await puppeteer.launch({
         timeout: 0,
         ignoreHTTPSErrors: true,
-        headless: false,
+        headless: true,
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
       })
       const page = await browser.newPage()
@@ -28,11 +28,11 @@ const collectionBot = async (collectionName, ranks) => {
           timeout: 0,
         }
       )
-      await delay(3000)
+      await delay(2000)
       await page.click("#sort-type")
       await page.keyboard.press("ArrowDown")
       await page.keyboard.press("Enter")
-      await delay(3000)
+      await delay(2000)
 
       await page.type(
         'input[placeholder="Max"]:first-child',
@@ -40,35 +40,26 @@ const collectionBot = async (collectionName, ranks) => {
       )
       await page.click("button.mantine-txbd7p")
       await delay(3000)
-      const html = await page.content()
 
-      let idx = 0
-      let end_idx = 0
-      idx = html.indexOf('line-height: 1.5;">', idx)
-      if (idx == -1) {
+      let texts = await page.evaluate(() => {
+        let elements = document.getElementsByClassName(
+          "mantine-5xhj36"
+        )
+        return Array.from(elements).map(el => el.innerHTML)
+      })
+      if (texts.length === 0) {
         return {
           rank,
           price: 1000000,
         }
       }
-      idx = idx + 'line-height: 1.5;">'.length
-
-      end_idx = html.indexOf("<", idx)
-
-      idx = html.indexOf('line-height: 1.5;">', idx)
-      idx = idx + 'line-height: 1.5;">'.length
-      idx = html.indexOf(">", idx)
-      end_idx = html.indexOf("<", idx)
-      const asset_price = html.substring(idx, end_idx)
-      const trimmed_asset_price = asset_price.substring(
-        1,
-        asset_price.length - 3
-      )
-      idx = end_idx
+      //mantine-5xhj36
+      //obtain text
+      const asset_price = texts[0].split(" ")[0]
       await browser.close()
       return {
         rank: rank == "1" ? "SE" : rank.toString(),
-        floor: trimmed_asset_price,
+        floor: asset_price,
       }
     })
 
@@ -127,11 +118,11 @@ const updateDatabase = (collection, results) => {
 
 const main = async () => {
   const OGs = await getCollection("OG")
-  updateDatabase("OG", OGs)
-  const RAs = await getCollection("RA")
-  updateDatabase("RA", RAs)
-  const BABYs = await getCollection("BABY")
-  updateDatabase("BABY", BABYs)
-  setTimeout(main, 1000 * 60 * 15)
+  //updateDatabase("OG", OGs)
+  //const RAs = await getCollection("RA")
+  //updateDatabase("RA", RAs)
+  //const BABYs = await getCollection("BABY")
+  //updateDatabase("BABY", BABYs)
+  //setTimeout(main, 1000 * 60 * 15)
 }
 main()
