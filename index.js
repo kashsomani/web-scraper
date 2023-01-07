@@ -28,11 +28,11 @@ const collectionBot = async (collectionName, ranks) => {
           timeout: 0,
         }
       )
-      await delay(2000)
+      await delay(3000)
       await page.click("#sort-type")
       await page.keyboard.press("ArrowDown")
       await page.keyboard.press("Enter")
-      await delay(2000)
+      await delay(3000)
 
       await page.type(
         'input[placeholder="Max"]:first-child',
@@ -118,11 +118,11 @@ const updateDatabase = (collection, results) => {
 
 const main = async () => {
   const OGs = await getCollection("OG")
-  //updateDatabase("OG", OGs)
-  //const RAs = await getCollection("RA")
-  //updateDatabase("RA", RAs)
-  //const BABYs = await getCollection("BABY")
-  //updateDatabase("BABY", BABYs)
+  updateDatabase("OG", OGs)
+  const RAs = await getCollection("RA")
+  updateDatabase("RA", RAs)
+  const BABYs = await getCollection("BABY")
+  updateDatabase("BABY", BABYs)
   //setTimeout(main, 1000 * 60 * 15)
 }
 main()
